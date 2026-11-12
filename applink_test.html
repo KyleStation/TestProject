@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Links Test</title>
+<style>
+  :root { --bg:#fff; --fg:#1a1f2b; --muted:#5b6475; --accent:#0b4ea2; --code:#f1f3f7; --border:#c9cfdb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14171d; --fg:#e8ebf1; --muted:#9aa3b5; --accent:#5b9bf0; --code:#1f242d; --border:#3a4150; }
+  }
+  body { margin:0; padding:24px 20px; background:var(--bg); color:var(--fg);
+         font-family:-apple-system,"Hiragino Sans","PingFang SC",Roboto,sans-serif; }
+  .wrap { max-width:420px; margin:0 auto; }
+  .label { color:var(--muted); font-size:13px; margin:16px 0 4px; display:block; }
+  input { width:100%; box-sizing:border-box; padding:10px; font-size:14px; border-radius:6px;
+          border:1px solid var(--border); background:var(--bg); color:var(--fg);
+          font-family:ui-monospace,Menlo,monospace; }
+  input:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  .btn { display:block; box-sizing:border-box; margin:24px 0;
+         padding:16px; border-radius:10px; background:var(--accent); color:#fff;
+         text-align:center; text-decoration:none; font-size:17px; font-weight:600; }
+  .btn:focus-visible { outline:3px solid var(--fg); outline-offset:3px; }
+  .url { background:var(--code); padding:10px; border-radius:6px; font-size:13px;
+         word-break:break-all; font-family:ui-monospace,Menlo,monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <label class="label" for="baseUrl">App Link URL</label>
+  <input id="baseUrl" type="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+  <a id="openApp" class="btn">Open app</a>
+
+  <div class="label">Target URL</div>
+  <div id="target" class="url"></div>
+</div>
+
+<script>
+  var input = document.getElementById("baseUrl");
+  var link = document.getElementById("openApp");
+  var targetEl = document.getElementById("target");
+  input.placeholder = "https://example.com/callback";
+
+  function buildTarget() {
+    var base = input.value.trim();
+    if (!base) return "";
+    var query = window.location.search; // 含开头的 "?"，没有 query 时为空字符串
+    if (query) {
+      // 如果填写的 URL 本身已带 query，用 & 拼接
+      base += (base.indexOf("?") === -1 ? query : "&" + query.substring(1));
+    }
+    return base;
+  }
+
+  function update() {
+    var target = buildTarget();
+    if (target) {
+      link.href = target;
+      link.removeAttribute("aria-disabled");
+      link.style.opacity = "";
+      link.style.pointerEvents = "";
+      targetEl.textContent = target;
+    } else {
+      link.removeAttribute("href");
+      link.setAttribute("aria-disabled", "true");
+      link.style.opacity = "0.4";
+      link.style.pointerEvents = "none";
+      targetEl.textContent = "Enter an App Link URL to continue.";
+    }
+  }
+
+  input.addEventListener("input", update);
+  update();
+</script>
+</body>
+</html>
